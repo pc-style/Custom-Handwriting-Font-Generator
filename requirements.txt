@@ -1,0 +1,6 @@
+reflex==0.8.20
+fonttools
+pillow
+opencv-python
+numpy
+scipy
