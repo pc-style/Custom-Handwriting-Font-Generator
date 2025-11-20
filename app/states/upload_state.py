@@ -1,6 +1,7 @@
 import reflex as rx
 import random
 import string
+import logging
 
 
 class UploadState(rx.State):
@@ -29,7 +30,17 @@ class UploadState(rx.State):
             with file_path.open("wb") as f:
                 f.write(data)
             new_files.append(filename)
-            self.labels[filename] = ""
+            label = ""
+            try:
+                if "_glyph_" in file.name:
+                    _, suffix = file.name.rsplit("_glyph_", 1)
+                    if "." in suffix:
+                        codepoint_str = suffix.rsplit(".", 1)[0]
+                        if codepoint_str.isdigit():
+                            label = chr(int(codepoint_str))
+            except Exception as e:
+                logging.exception(f"Error parsing filename for label: {e}")
+            self.labels[filename] = label
         self.uploaded_files.extend(new_files)
         self.is_uploading = False
         yield rx.toast.success(f"Uploaded {len(files)} sample(s)")
